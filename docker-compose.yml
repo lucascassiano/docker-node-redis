@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  redis:
+    container_name: redis
+    image: "redis"
+    command: redis-server --appendonly yes #make redis use persistent storage
+    expose:
+      - 6379
+    restart: always
+    volumes:
+      - ./redis-data:/data #binds the local directory ./redis-data with your repo
+  app:
+    container_name: "ui"
+    build: ./app
+    ports:
+      - "3000:8080"
+    depends_on:
+      - redis
+    command: npm run dev
+    links:
+      - redis
+    environment:
+      - REDIS=redis
+    volumes:
+      - ./app:/app
+    restart: always
